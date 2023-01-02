@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>With Alpine</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="./alpine/cart.js"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</head>
+
+<body>
+    <header>
+        <ul>
+            <li><a href="./index.html">With Pure JS</a></li>
+            <li><a href="./jquery.html">With jQuery</a></li>
+            <li><a href="./vue.html">With Vue</a></li>
+            <li><a href="./alpine.html">With Alpine</a></li>
+        </ul>
+    </header>
+
+    <div x-data id="app">
+        <div class="cart-area">
+            <div @click.prevent="$store.state.cartIsOpen = ! $store.state.cartIsOpen" class="cart-icon">
+                <svg width="28" height="28" fill="currentColor" viewBox="0 0 16 16">
+                    <path
+                        d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM3.102 4l1.313 7h8.17l1.313-7H3.102zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z">
+                    </path>
+                </svg>
+                <span class="item-count" x-text="$store.state.carts.length"></span>
+            </div>
+
+            <div x-show="$store.state.cartIsOpen" style="display: none;" x-transition class="cart-items">
+                <h1 style="font-size: 24px; padding: 0px 10px 10px; text-align: center;">Shopping Cart</h1>
+                <div class="cart-item-wrap">
+                    <div x-show="! $store.state.carts.length" class="no-item-in-cart">Your cart is empty</div>
+                    <template x-for="cart in $store.state.carts" :key="cart.id">
+                        <div class="cart-item">
+                            <img :src="cart.image" :alt="cart.title">
+                            <div class="p-name-price">
+                                <span class="cp-name capitalize" x-text="cart.title"></span>
+                                <span class="cp-price" x-text="cart.price * cart.qty"></span>
+                            </div>
+                            <div class="close-qty">
+                                <input class="cart-qty" type="number" @input="$store.state.preventNegative(cart.id)"
+                                    x-model="cart.qty" />
+                                <a href="#" @click.prevent="$store.state.removeItem(cart)" class="delete-item">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                        <path
+                                            d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z">
+                                        </path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <hr style="margin: 20px 0px 10px;">
+                <div class="cart-total">
+                    <span>Total:</span>
+                    <span x-text="$store.state.cartTotal()"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="categories">
+            <template x-for="[category, products] of Object.entries($store.state.productsByCategory)" :key="category">
+                <div class="category">
+                    <h3 class="cat-name capitalize" x-text="category"></h3>
+                    <div class="products">
+                        <template x-for="product in products" :key="product.id">
+                            <div class="product">
+                                <input class="product-id" type="hidden" :value="product.id">
+                                <img :src="product.thumbnail" :alt="product.title">
+                                <div class="details">
+                                    <div class="p-title" x-text="product.title"></div>
+                                    <div class="description" x-text="product.description"></div>
+                                    <div class="price-rate">
+                                        <div class="price">
+                                            <span x-text="`Price: $${product.price}`"></span>
+                                        </div>
+                                        <div class="rating">
+                                            <span x-text="`Rating: ${product.rating} / 5`"></span>
+                                        </div>
+                                    </div>
+                                    <div style="width: 100%;">
+                                        <button type="button" @click.prevent="$store.state.addToCart(product)"
+                                            class="cart-btn">Add to cart</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+
+    <script>
+        // function productsByCategory() {
+        //     return {
+        //         productsByCategory: [],
+
+        //         async init() {
+        //             const response = await fetch("https://dummyjson.com/products?limit=100");
+        //             const { products } = await response.json();
+
+        //             this.productsByCategory = this.getProductsByCategory(products)
+        //         },
+
+        //         addToCart(product) {
+        //             console.log(product);
+        //         },
+
+        //         getProductsByCategory(products) {
+        //             const productsByCategory = {};
+
+        //             products.forEach((product) => {
+        //                 if (productsByCategory.hasOwnProperty(product.category)) {
+        //                     productsByCategory[product.category].push(product);
+        //                 } else {
+        //                     productsByCategory[product.category] = [product];
+        //                 }
+        //             });
+
+        //             return productsByCategory;
+        //         }
+        //     }
+        // }
+    </script>
+</body>
+
+</html>

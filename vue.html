@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>With Vue</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="reset.css">
+    <link rel="stylesheet" href="styles.css">
+
+    <script type="importmap">
+        {
+            "imports": {
+                "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+            }
+        }
+    </script>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <ul>
+            <li><a href="./index.html">With Pure JS</a></li>
+            <li><a href="./jquery.html">With jQuery</a></li>
+            <li><a href="./vue.html">With Vue</a></li>
+            <li><a href="./alpine.html">With Alpine</a></li>
+        </ul>
+    </header>
+
+    <div id="app"></div>
+
+
+
+    <script type="module">
+        import { createApp } from 'vue'
+        import App from './vue/app.js'
+
+        createApp(App).mount('#app')
+    </script>
+</body>
+
+</html>
